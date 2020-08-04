@@ -127,6 +127,11 @@ function salesmanago_integration_webform_submit_handler($form, FormStateInterfac
     $options["contact"]["phone"] = $form_values["phone"];
   }
 
+  if (isset($form_values["message"]) and $form_values["message"] != '') {
+    $messageLabel = "mail " . date("Y-m-d H:i:s");
+    $options["properties"][$messageLabel] = $form_values["message"];
+  }
+
   if (isset($form_values["pickList"]) and $form_values["pickList"] != '') {
     $detailLabel = date("Y-m-d H:i:s");
     $options["properties"][$detailLabel] = $form_values["pickList"];

@@ -33,9 +33,6 @@ salesmanago_integration.salesmanago.*:
     uuid:
       type: string
       label: 'UUID'
-    apiform_id:
-      type: string
-      label: 'Webform form ID'
     name:
       type: string
       label: 'Webform name field ID'
@@ -43,6 +40,9 @@ salesmanago_integration.salesmanago.*:
       type: string
       label: 'Webform email field ID'
     phone:
+      type: string
+      label: 'Webform phone field ID'
+    message:
       type: string
       label: 'Webform phone field ID'
     forceOptIn:

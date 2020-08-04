@@ -125,6 +125,13 @@ class SalesManagoFormBase extends EntityForm {
       '#default_value' => $salesmanago->forcePhoneOptIn,
     ];
 
+    $form['standard_detail']['message'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Message field ID'),
+      '#maxlength' => 255,
+      '#default_value' => $salesmanago->message,
+    ];
+
     $form['standard_detail']['pickList'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Picklist field ID'),
@@ -219,13 +226,13 @@ class SalesManagoFormBase extends EntityForm {
 
     if ($status == SAVED_UPDATED) {
       // If we edited an existing entity...
-      $this->messenger()->addMessage($this->t('SALESmanago Form %apiform_id has been updated.', ['%apiform_id' => $salesmanago->apiform_id]));
-      $this->logger('salesmanago_integration')->notice('SALESmanago Form %apiform_id has been updated.', ['%apiform_id' => $salesmanago->apiform_id, 'link' => $edit_link]);
+      $this->messenger()->addMessage($this->t('SALESmanago Form %id has been updated.', ['%id' => $salesmanago->id]));
+      $this->logger('salesmanago_integration')->notice('SALESmanago Form %id has been updated.', ['%id' => $salesmanago->id, 'link' => $edit_link]);
     }
     else {
       // If we created a new entity...
-      $this->messenger()->addMessage($this->t('SALESmanago Form %apiform_id has been added.', ['%apiform_id' => $salesmanago->apiform_id]));
-      $this->logger('salesmanago_integration')->notice('SALESmanago Form %apiform_id has been added.', ['%apiform_id' => $salesmanago->apiform_id, 'link' => $edit_link]);
+      $this->messenger()->addMessage($this->t('SALESmanago Form %id has been added.', ['%id' => $salesmanago->id]));
+      $this->logger('salesmanago_integration')->notice('SALESmanago Form %id has been added.', ['%id' => $salesmanago->id, 'link' => $edit_link]);
     }
 
     // Redirect the user back to the listing route after the save operation.

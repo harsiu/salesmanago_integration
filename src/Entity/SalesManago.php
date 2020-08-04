@@ -32,10 +32,10 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *   config_export = {
  *     "id",
  *     "uuid",
- *     "apiform_id",
  *     "name",
  *     "email",
  *     "phone",
+ *     "message",
  *     "forceOptIn",
  *     "forcePhoneOptIn",
  *     "pickList",
@@ -78,6 +78,13 @@ class SalesManago extends ConfigEntityBase {
    * @var string
    */
   public $phone;
+
+  /**
+   * Message field ID
+   *
+   * @var string
+   */
+  public $message;
 
   /**
    * Email consent.
