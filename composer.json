@@ -1,5 +1,5 @@
 {
-    "name": "drupal/salesmanago_integration",
+    "name": "harsiu/salesmanago_integration",
     "description": "Allow drupal forms to create and edit contacts on your SALESmanago account",
     "type": "drupal-module",
     "authors": [
@@ -12,4 +12,3 @@
       "drupal/webform": "^5.19"
     }
   }
-  
