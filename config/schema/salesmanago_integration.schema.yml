@@ -1,0 +1,56 @@
+# Schema for the configuration files of the SALESmanago Integration module.
+
+salesmanago_integration.endpoint.*:
+  type: config_entity
+  label: 'SALESmanago Endpoint'
+  mapping:
+    id:
+      type: string
+      label: 'Endpoint id'
+    uuid:
+      type: string
+      label: 'UUID'
+    address:
+      type: string
+      label: 'Endpoint Address'
+    client_id:
+      type: string
+      label: 'Client ID'
+    api_secret:
+      type: string
+      label: 'API Secret'
+    langcode:
+      type: string
+      label: 'Default language'
+
+salesmanago_integration.salesmanago.*:
+  type: config_entity
+  label: 'SALESmanago Endpoint'
+  mapping:
+    id:
+      type: string
+      label: 'SALESmanago entity id'
+    uuid:
+      type: string
+      label: 'UUID'
+    apiform_id:
+      type: string
+      label: 'Webform form ID'
+    name:
+      type: string
+      label: 'Webform name field ID'
+    email:
+      type: string
+      label: 'Webform email field ID'
+    phone:
+      type: string
+      label: 'Webform phone field ID'
+    forceOptIn:
+      type: string
+      label: 'Email consent checkbox ID'
+    forcePhoneOptIn:
+      type: string
+      label: 'Phone consent checkbox ID'
+    pickList:
+      type: string
+      label: 'Picklist field ID'

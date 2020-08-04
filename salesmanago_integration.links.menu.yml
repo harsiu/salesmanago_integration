@@ -1,0 +1,19 @@
+# Menu links
+salesmanago_integration.admin_config:
+  title: 'SALESmanago integration settings'
+  parent: system.admin_config
+  route_name: entity.endpoint.list
+  weight: 30
+
+system.admin_sm_api:
+  title: 'Configure endpoint'
+  route_name: entity.endpoint.list
+  parent: salesmanago_integration.admin_config
+  weight: 30
+
+system.admin_sm_form:
+  title: 'Configure SALESmanago forms'
+  route_name: entity.salesmanago.list
+  parent: salesmanago_integration.admin_config
+  weight: 30
+

@@ -1,0 +1,4 @@
+# Define the administer permission for editing endpoints and managing forms.
+'administer salesmanago':
+  title: 'Administer salesmanago'
+  description: 'Edit endpoints, manage all salesmanago webform settings'

@@ -1,0 +1,19 @@
+# Action buttons in the configuration pages
+salesmanago_integration.salesmanago_add_action:
+  route_name: entity.salesmanago.add_form
+  title: 'Add webform configuration'
+  appears_on:
+    - entity.salesmanago.list
+
+salesmanago_integration.salesmanago_list_action:
+  route_name: entity.salesmanago.list
+  title: 'List configured webforms'
+  appears_on:
+    - entity.salesmanago.add_form
+    - entity.salesmanago.edit_form
+
+salesmanago_integration.endpoint_list_action:
+  route_name: entity.endpoint.list
+  title: 'List Endpoint'
+  appears_on:
+    - entity.endpoint.edit_form

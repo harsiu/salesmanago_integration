@@ -1,0 +1,10 @@
+# Tabs in the configuration page
+salesmanago_integration.api_tab:
+  route_name: entity.endpoint.list
+  title: API Settings
+  base_route: entity.endpoint.list
+
+salesmanago_integration.forms_tab:
+  route_name: entity.salesmanago.list
+  title: Enabled Forms
+  base_route: entity.endpoint.list

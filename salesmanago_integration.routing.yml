@@ -1,0 +1,49 @@
+# Module routes
+entity.endpoint.list:
+  path: '/admin/config/salesmanago-integration/endpoint'
+  defaults:
+    _entity_list: endpoint
+    _title: 'Endpoint'
+  requirements:
+    _permission: 'administer salesmanago'
+
+entity.endpoint.edit_form:
+  path: '/admin/config/salesmanago-integration/{endpoint}/edit'
+  defaults:
+    _title: 'Edit endpoint config'
+    _entity_form: endpoint.edit
+  requirements:
+    _entity_access: endpoint.update
+
+
+entity.salesmanago.list:
+  path: '/admin/config/salesmanago-integration/forms'
+  defaults:
+    _entity_list: salesmanago
+    _title: 'Integrated webforms'
+  requirements:
+    _permission: 'administer salesmanago'
+
+entity.salesmanago.add_form:
+  path: '/admin/config/salesmanago-integration/form/add'
+  defaults:
+    _title: 'Add webform config'
+    _entity_form: salesmanago.add
+  requirements:
+    _entity_create_access: salesmanago
+
+entity.salesmanago.edit_form:
+  path: '/admin/config/salesmanago-integration/form/{salesmanago}/edit'
+  defaults:
+    _title: 'Edit webform config'
+    _entity_form: salesmanago.edit
+  requirements:
+    _entity_access: salesmanago.update
+
+entity.salesmanago.delete_form:
+  path: '/admin/config/salesmanago-integration/form/{salesmanago}/delete'
+  defaults:
+    _title: 'Delete webform config'
+    _entity_form: salesmanago.delete
+  requirements:
+    _entity_access: salesmanago.delete

@@ -1,0 +1,15 @@
+{
+    "name": "drupal/salesmanago_integration",
+    "description": "Allow drupal forms to create and edit contacts on your SALESmanago account",
+    "type": "drupal-module",
+    "authors": [
+      {
+        "name": "Haris Šiukšta"
+      }
+    ],
+    "license": "GPL-2.0+",
+    "require": {
+      "drupal/webform": "^5.19"
+    }
+  }
+  

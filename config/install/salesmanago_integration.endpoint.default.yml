@@ -1,0 +1,10 @@
+# The id of the config entity.
+id: 'default'
+# The endpoint address
+address: 'Your SALESmanago endpoint address'
+# Endpoint client ID
+client_id: 'SALESmanago Client ID'
+# Endpoint API secret
+api_secret: 'SALESmanago API secret key'
+# SALESmanago
+email: 'SALESmanago account email address'
