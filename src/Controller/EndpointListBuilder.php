@@ -4,7 +4,7 @@ namespace Drupal\salesmanago_integration\Controller;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\examples\Utility\DescriptionTemplateTrait;
+use Drupal\salesmanago_integration\Utility\DescriptionTemplateTrait;
 
 /**
  * Provides a listing of endpoint entities.
