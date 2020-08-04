@@ -9,6 +9,6 @@
     ],
     "license": "GPL-2.0+",
     "require": {
-      "drupal/webform": "^5.19"
+      "drupal/webform": "^5.16"
     }
   }
