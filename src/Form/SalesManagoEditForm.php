@@ -26,7 +26,7 @@ class SalesManagoEditForm extends SalesManagoFormBase {
    */
   protected function actions(array $form, FormStateInterface $form_state) {
     $actions = parent::actions($form, $form_state);
-    $actions['submit']['#value'] = $this->t('Update Endpoint');
+    $actions['submit']['#value'] = $this->t('Update From');
     return $actions;
   }
 }

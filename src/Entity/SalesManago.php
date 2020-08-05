@@ -38,6 +38,8 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *     "message",
  *     "forceOptIn",
  *     "forcePhoneOptIn",
+ *     "consentCount",
+ *     "customConsents",
  *     "pickList",
  *   }
  * )
@@ -99,6 +101,20 @@ class SalesManago extends ConfigEntityBase {
    * @var string
    */
   public $forcePhoneOptIn;
+
+  /**
+   * Custom consents.
+   *
+   * @var array
+   */
+  public $consentCount;
+
+  /**
+   * Custom consents.
+   *
+   * @var array
+   */
+  public $customConsents;
 
   /**
    * Picklist field ID

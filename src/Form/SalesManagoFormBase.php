@@ -125,6 +125,46 @@ class SalesManagoFormBase extends EntityForm {
       '#default_value' => $salesmanago->forcePhoneOptIn,
     ];
 
+    $form['consents']['consentCount'] = [
+      '#type' => 'number',
+      '#title' => $this->t('How many custom consents to configure?'),
+      '#max' => 8,
+      '#default_value' => $salesmanago->consentCount,
+    ];
+
+    $form['consents']['customConsents']['#tree'] = TRUE;
+
+    $consentCount = $salesmanago->consentCount;
+
+    for ($index = 0; $index < $consentCount; $index++) {
+      $name = isset($salesmanago->customConsents[$index]['name']) ? $salesmanago->customConsents[$index]['name'] : '';
+      $field = isset($salesmanago->customConsents[$index]['field']) ? $salesmanago->customConsents[$index]['field'] : '';
+
+      if ($name != '') {
+        $form['consents']['customConsents'][$index] = [
+          '#type' => 'details',
+          '#title' => $this->t("Custom consent - '" . $name . "'"),
+        ];
+      } else {
+        $form['consents']['customConsents'][$index] = [
+          '#type' => 'details',
+          '#title' => $this->t("Custom consent config #" . ($index + 1)),
+        ];
+      }
+      $form['consents']['customConsents'][$index]['name'] = [
+        '#type' => 'textfield',
+        '#title' => $this->t('Custom consent name in SM CRM'),
+        '#maxlength' => 255,
+        '#default_value' => $name,
+      ];
+      $form['consents']['customConsents'][$index]['field'] = [
+        '#type' => 'textfield',
+        '#title' => $this->t('Custom consent form field ID'),
+        '#maxlength' => 255,
+        '#default_value' => $field,
+      ];
+    }
+
     $form['standard_detail']['message'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Message field ID'),

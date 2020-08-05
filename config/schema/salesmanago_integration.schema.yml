@@ -51,6 +51,19 @@ salesmanago_integration.salesmanago.*:
     forcePhoneOptIn:
       type: string
       label: 'Phone consent checkbox ID'
+    consentCount:
+      type: integer
+      label: 'Count of custom consents the system will use'
+    customConsents:
+      type: mapping
+      label: 'Custom consent settings'
+      mapping:
+        name:
+          type: string
+          label: 'Consent name'
+        field:
+          type: string
+          label: 'Consent form field ID'
     pickList:
       type: string
       label: 'Picklist field ID'

@@ -26,7 +26,7 @@ class SalesManagoAddForm extends SalesManagoFormBase {
    */
   protected function actions(array $form, FormStateInterface $form_state) {
     $actions = parent::actions($form, $form_state);
-    $actions['submit']['#value'] = $this->t('Create Endpoint');
+    $actions['submit']['#value'] = $this->t('Create Form config');
     return $actions;
   }
 }
