@@ -44,17 +44,28 @@ function salesmanago_integration_webform_submit_handler($form, FormStateInterfac
   $form_values = [];
 
   foreach ($form_fields as $sm_field => $webform_field) {
-    if ($sm_field == "uuid" or $sm_field == "id") { // define salesmanago config fields to ignore
+    // ignore these fields because they don't correspond to a form field
+    if ($sm_field == 'uuid' or $sm_field == 'id' or $sm_field == 'consentCount') {
       continue;
     }
 
-    if (!empty($webform_field)) {
+    // handle consentDetails, it's value is a array of consent name => form field id used to agree to consent
+    if ($sm_field == 'consentDetails') {
+      for ($index = 0; $index < $form_fields->consentCount; $index++) {
+        $form_values[$sm_field][$index] = $form_state->getValue($webform_field[$index]['field']);
+      }
+      continue;
+    }
+
+    // if SM API field has a form field configured
+    if (isset($webform_field) and $webform_field != '') {
       $form_values[$sm_field] = $form_state->getValue($webform_field);
     }
   }
 
-  $url = "https://" . $endpoint->address . "/api/contact/upsert"; // set full path for specific api request
+  $url = 'https://' . $endpoint->address . '/api/contact/upsert'; // set full path for specific api request
   $client_id = $endpoint->client_id;
+  $current_time = \Drupal::time()->getRequestTime();
 
   /**
    * @param $api_key
@@ -65,6 +76,8 @@ function salesmanago_integration_webform_submit_handler($form, FormStateInterfac
   $api_secret = $endpoint->api_secret;
   $sha = sha1($api_key . $client_id . $api_secret);
 
+  // default opt ins to false and set them to true if SM API field has a form
+  // field configured and that form field value is true
   $forceOptIn = false;
   $forcePhoneOptIn = false;
 
@@ -101,60 +114,76 @@ function salesmanago_integration_webform_submit_handler($form, FormStateInterfac
    * All other variables used in the /api/contact/upsert call are optional
    */
   $options = [
-    "headers" => [
-      "Accept" => "application/json, application/json",
-      "Content-Type" => "application/json;charset=UTF-8"
+    'headers' => [
+      'Accept' => 'application/json, application/json',
+      'Content-Type' => 'application/json;charset=UTF-8'
     ],
-    "clientId" => $client_id,
-    "apiKey" => $api_key,
-    "requestTime" => \Drupal::time()->getRequestTime(),
-    "sha" => $sha,
-    "async" => true,
-    "contact" => [
-      "name" => $form_values['name'],
-      "email" => $form_values['email'],
+    'clientId' => $client_id,
+    'apiKey' => $api_key,
+    'requestTime' => $current_time,
+    'sha' => $sha,
+    'async' => true,
+    'contact' => [
+      'name' => $form_values['name'],
+      'email' => $form_values['email'],
     ],
-    "owner" => $endpoint->email,
-    "forceOptOut" => !$forceOptIn,
-    "forceOptIn" => $forceOptIn,
-    "forcePhoneOptOut" => !$forcePhoneOptIn,
-    "forcePhoneOptIn" => $forcePhoneOptIn,
-    "properties" => [
+    'owner' => $endpoint->email,
+    'forceOptOut' => !$forceOptIn,
+    'forceOptIn' => $forceOptIn,
+    'forcePhoneOptOut' => !$forcePhoneOptIn,
+    'forcePhoneOptIn' => $forcePhoneOptIn,
+    'properties' => [
     ],
+    'consentDetails' => [
+    ]
   ];
 
-  if (isset($form_values["phone"]) and $form_values["phone"] != '') {
-    $options["contact"]["phone"] = $form_values["phone"];
+  // if submitted form field value is empty, do not include it in the API request
+  // if SM already has these contact details, then submitting a key with no value deletes that specific contact detail
+  if (isset($form_values['phone']) and $form_values['phone'] != '') {
+    $options['contact']['phone'] = $form_values['phone'];
   }
 
-  if (isset($form_values["message"]) and $form_values["message"] != '') {
-    $messageLabel = "mail " . date("Y-m-d H:i:s");
-    $options["properties"][$messageLabel] = $form_values["message"];
+  if (isset($form_values['message']) and $form_values['message'] != '') {
+    $messageLabel = 'mail ' . date('Y-m-d H:i:s');
+    $options['properties'][$messageLabel] = $form_values['message'];
   }
 
-  if (isset($form_values["pickList"]) and $form_values["pickList"] != '') {
-    $detailLabel = date("Y-m-d H:i:s");
-    $options["properties"][$detailLabel] = $form_values["pickList"];
+  if (isset($form_values['pickList']) and $form_values['pickList'] != '') {
+    $detailLabel = date('Y-m-d H:i:s');
+    $options['properties'][$detailLabel] = $form_values['pickList'];
   }
 
-  /**
-   * Try sending a POST request to SALESmanago API.
-   *
-   * SALESmanago API only accepted requests that have been put on an array named 'json'.
-   */
+  if (isset($form_fields->consentCount) and $form_fields->consentCount > 0) {
+    for ($index = 0; $index < $form_fields->consentCount; $index++) {
+      $options['consentDetails'][] = [
+        'consentName' => $form_fields->consentDetails[$index]['name'],
+        'consentAccept' => $form_values['consentDetails'][$index],
+        'ip' => \Drupal::request()->getClientIp(),
+        'optOut' => true,
+      ];
+    }
+  }
+
+  // Try sending a POST request to SALESmanago API.
+  // SALESmanago API only accepted requests that have been put on an array named 'json'.
   try {
+    $logger = \Drupal::logger('salesmanago_integration');
+    $logger->notice('TEST');
+
+    $logger->notice(dpr($form_fields));
+
     $response = \Drupal::httpClient()->post($url, ['json' => $options]);
 
-    /**
-     * DBLog messages
-     */
+
+    // DBLog messages
     if ($response->getStatusCode() == 200) {
-      \Drupal::logger('salesmanago_integration')->notice("Request to SALESmanago API executed successfully.");
+        $logger->notice('Request to SALESmanago API executed successfully.');
     } else {
-      \Drupal::logger('salesmanago_integration')->warning("SALESmanago API request error: <br />" . $response->getBody());
+      $logger->warning('SALESmanago API request error: <br />' . $response->getBody());
     }
   }
   catch (RequestException $e) {
-    \Drupal::logger('salesmanago_integration')->error($e->getMessage());
+    $logger->error($e->getMessage());
   }
 }

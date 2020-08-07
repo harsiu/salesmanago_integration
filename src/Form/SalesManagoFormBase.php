@@ -66,8 +66,8 @@ class SalesManagoFormBase extends EntityForm {
       '#default_value' => $salesmanago->id(),
       '#machine_name' => [
         'exists' => [$this, 'exists'],
-        'replace_pattern' => '([^a-z0-9_]+)|(^custom$)',
-        'error' => 'The machine-readable name must be unique, and can only contain lowercase letters, numbers, and underscores. Additionally, it can not be the reserved word "custom".',
+        'replace_pattern' => "([^a-z0-9_]+)|(^custom$)",
+        'error' => "The machine-readable name must be unique, and can only contain lowercase letters, numbers, and underscores. Additionally, it can not be the reserved word 'custom'.",
       ],
       '#disabled' => !$salesmanago->isNew(),
     ];
@@ -132,32 +132,32 @@ class SalesManagoFormBase extends EntityForm {
       '#default_value' => $salesmanago->consentCount,
     ];
 
-    $form['consents']['customConsents']['#tree'] = TRUE;
+    $form['consents']['consentDetails']['#tree'] = TRUE;
 
     $consentCount = $salesmanago->consentCount;
 
     for ($index = 0; $index < $consentCount; $index++) {
-      $name = isset($salesmanago->customConsents[$index]['name']) ? $salesmanago->customConsents[$index]['name'] : '';
-      $field = isset($salesmanago->customConsents[$index]['field']) ? $salesmanago->customConsents[$index]['field'] : '';
+      $name = isset($salesmanago->consentDetails[$index]['name']) ? $salesmanago->consentDetails[$index]['name'] : '';
+      $field = isset($salesmanago->consentDetails[$index]['field']) ? $salesmanago->consentDetails[$index]['field'] : '';
 
       if ($name != '') {
-        $form['consents']['customConsents'][$index] = [
+        $form['consents']['consentDetails'][$index] = [
           '#type' => 'details',
           '#title' => $this->t("Custom consent - '" . $name . "'"),
         ];
       } else {
-        $form['consents']['customConsents'][$index] = [
+        $form['consents']['consentDetails'][$index] = [
           '#type' => 'details',
-          '#title' => $this->t("Custom consent config #" . ($index + 1)),
+          '#title' => $this->t('Custom consent config #' . ($index + 1)),
         ];
       }
-      $form['consents']['customConsents'][$index]['name'] = [
+      $form['consents']['consentDetails'][$index]['name'] = [
         '#type' => 'textfield',
         '#title' => $this->t('Custom consent name in SM CRM'),
         '#maxlength' => 255,
         '#default_value' => $name,
       ];
-      $form['consents']['customConsents'][$index]['field'] = [
+      $form['consents']['consentDetails'][$index]['field'] = [
         '#type' => 'textfield',
         '#title' => $this->t('Custom consent form field ID'),
         '#maxlength' => 255,

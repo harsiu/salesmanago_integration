@@ -54,7 +54,7 @@ salesmanago_integration.salesmanago.*:
     consentCount:
       type: integer
       label: 'Count of custom consents the system will use'
-    customConsents:
+    consentDetails:
       type: mapping
       label: 'Custom consent settings'
       mapping:
