@@ -42,6 +42,9 @@ salesmanago_integration.salesmanago.*:
     phone:
       type: string
       label: 'Webform phone field ID'
+    tags:
+      type: array
+      label: 'Contact tags'
     message:
       type: string
       label: 'Webform phone field ID'

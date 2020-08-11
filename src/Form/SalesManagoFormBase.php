@@ -111,6 +111,13 @@ class SalesManagoFormBase extends EntityForm {
       '#default_value' => $salesmanago->phone,
     ];
 
+    $form['contact_info']['tags'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Contact tags'),
+      '#maxlength' => 255,
+      '#default_value' => $salesmanago->tags,
+    ];
+
     $form['consents']['forceOptIn'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Email opt in checkbox ID'),

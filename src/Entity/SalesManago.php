@@ -35,6 +35,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *     "name",
  *     "email",
  *     "phone",
+ *     "tags",
  *     "message",
  *     "forceOptIn",
  *     "forcePhoneOptIn",
@@ -80,6 +81,13 @@ class SalesManago extends ConfigEntityBase {
    * @var string
    */
   public $phone;
+
+  /**
+   * Contact tags.
+   *
+   * @var string
+   */
+  public $tags;
 
   /**
    * Message field ID

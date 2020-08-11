@@ -132,6 +132,8 @@ function salesmanago_integration_webform_submit_handler($form, FormStateInterfac
     'forceOptIn' => $forceOptIn,
     'forcePhoneOptOut' => !$forcePhoneOptIn,
     'forcePhoneOptIn' => $forcePhoneOptIn,
+    'tags' => [
+    ],
     'properties' => [
     ],
     'consentDetails' => [
@@ -142,6 +144,10 @@ function salesmanago_integration_webform_submit_handler($form, FormStateInterfac
   // if SM already has these contact details, then submitting a key with no value deletes that specific contact detail
   if (isset($form_values['phone']) and $form_values['phone'] != '') {
     $options['contact']['phone'] = $form_values['phone'];
+  }
+
+  if (isset($form_fields->tags) and $form_fields->tags != '') {
+    $options['tags'][] = $form_fields->tags;
   }
 
   if (isset($form_values['message']) and $form_values['message'] != '') {
@@ -169,9 +175,6 @@ function salesmanago_integration_webform_submit_handler($form, FormStateInterfac
   // SALESmanago API only accepted requests that have been put on an array named 'json'.
   try {
     $logger = \Drupal::logger('salesmanago_integration');
-    $logger->notice('TEST');
-
-    $logger->notice(dpr($form_fields));
 
     $response = \Drupal::httpClient()->post($url, ['json' => $options]);
 
