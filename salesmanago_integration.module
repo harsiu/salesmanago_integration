@@ -2,6 +2,7 @@
 
 use GuzzleHttp\Exception\RequestException;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Entity\EntityInterface;
 /**
  * Use this function to find the ID of the webform,
  * then call a function as the form is submitted.
@@ -31,7 +32,6 @@ function salesmanago_integration_form_alter(&$form, FormStateInterface $form_sta
 function salesmanago_integration_webform_submit_handler($form, FormStateInterface $form_state) {
   // endpoint config
   $endpoint = \Drupal::entityTypeManager()->getStorage('endpoint')->load('default');
-
   // salesmanago config for current form
   $form_fields = \Drupal::entityTypeManager()->getStorage('salesmanago')->load($form['form_id']['#value']);
 
@@ -41,58 +41,14 @@ function salesmanago_integration_webform_submit_handler($form, FormStateInterfac
    *   - key is salesmanago entity key;
    *   - value is value of submitted form field
    */
-  $form_values = [];
+  $form_values = get_form_values($form_fields, $form_state);
 
-  foreach ($form_fields as $sm_field => $webform_field) {
-    // ignore these fields because they don't correspond to a form field
-    if ($sm_field == 'uuid' or $sm_field == 'id' or $sm_field == 'consentCount') {
-      continue;
-    }
-
-    // handle consentDetails, it's value is a array of consent name => form field id used to agree to consent
-    if ($sm_field == 'consentDetails') {
-      for ($index = 0; $index < $form_fields->consentCount; $index++) {
-        $form_values[$sm_field][$index] = $form_state->getValue($webform_field[$index]['field']);
-      }
-      continue;
-    }
-
-    // if SM API field has a form field configured
-    if (isset($webform_field) and $webform_field != '') {
-      $form_values[$sm_field] = $form_state->getValue($webform_field);
-    }
-  }
-
-  $url = 'https://' . $endpoint->address . '/api/contact/upsert'; // set full path for specific api request
   $client_id = $endpoint->client_id;
-  $current_time = \Drupal::time()->getRequestTime();
-
-  /**
-   * @param $api_key
-   *   A random string generated before every API request.
-   *   SALESmanago API docs do not specify length requirements, we use 10 characters.
-   */
-  $api_key = substr(md5(rand()), 0, 10);
+  $api_key = substr(md5(rand()), 0, 10); // randomly generated string
   $api_secret = $endpoint->api_secret;
   $sha = sha1($api_key . $client_id . $api_secret);
 
-  // default opt ins to false and set them to true if SM API field has a form
-  // field configured and that form field value is true
-  $forceOptIn = false;
-  $forcePhoneOptIn = false;
-
-  if (isset($form_values['forceOptIn']) and $form_values['forceOptIn'] == 1) {
-    $forceOptIn = true;
-  }
-
-  if (isset($form_values['forcePhoneOptIn']) and $form_values['forcePhoneOptIn'] == 1) {
-    $forcePhoneOptIn = true;
-  }
-
   /**
-   * @param $options
-   *   Array of elements to be passed to the API
-   *
    * Accept and Content-Type headers are required according to Salesmanago API
    * @see https://docs.salesmanago.com/#general-information
    *
@@ -120,7 +76,7 @@ function salesmanago_integration_webform_submit_handler($form, FormStateInterfac
     ],
     'clientId' => $client_id,
     'apiKey' => $api_key,
-    'requestTime' => $current_time,
+    'requestTime' => '',
     'sha' => $sha,
     'async' => true,
     'contact' => [
@@ -128,10 +84,10 @@ function salesmanago_integration_webform_submit_handler($form, FormStateInterfac
       'email' => $form_values['email'],
     ],
     'owner' => $endpoint->email,
-    'forceOptOut' => !$forceOptIn,
-    'forceOptIn' => $forceOptIn,
-    'forcePhoneOptOut' => !$forcePhoneOptIn,
-    'forcePhoneOptIn' => $forcePhoneOptIn,
+    'forceOptOut' => true,
+    'forceOptIn' => false,
+    'forcePhoneOptOut' => true,
+    'forcePhoneOptIn' => false,
     'tags' => [
     ],
     'properties' => [
@@ -140,10 +96,68 @@ function salesmanago_integration_webform_submit_handler($form, FormStateInterfac
     ]
   ];
 
-  // if submitted form field value is empty, do not include it in the API request
-  // if SM already has these contact details, then submitting a key with no value deletes that specific contact detail
+  set_optional_values($form_fields, $form_values, $options);
+
+  $url = 'https://' . $endpoint->address . '/api/contact/upsert'; // set full path for specific api request
+  send_request($url, $options);
+}
+
+/**
+ * Get form values from form fields specified in SALESmanago forms settings
+ * Loop over SM forms settings and get all configured form field values
+ *
+ * @param EntityInterface $form_fields Form field ids from configuration
+ * @param FormStateInterface $form_state
+ * @return array
+ */
+function get_form_values(EntityInterface $form_fields, FormStateInterface $form_state) {
+  $form_values = [];
+
+  foreach ($form_fields as $sm_field => $webform_field) {
+    // ignore these fields because they don't correspond to a form field
+    if ($sm_field == 'uuid' or $sm_field == 'id' or $sm_field == 'consentCount') {
+      continue;
+    }
+
+    // handle consentDetails, it's value is a array of consent name => form field id used to agree to consent
+    if ($sm_field == 'consentDetails') {
+      for ($index = 0; $index < $form_fields->consentCount; $index++) {
+        $form_values[$sm_field][$index] = $form_state->getValue($webform_field[$index]['field']);
+      }
+      continue;
+    }
+
+    // if SM API field is configured
+    if (isset($webform_field) and $webform_field != '') {
+      $form_values[$sm_field] = $form_state->getValue($webform_field);
+    }
+  }
+
+  return $form_values;
+}
+
+/**
+ * Set optional SM form config values to request array if they are configured.
+ * If submitted form field value is empty, do not include it in the API request.
+ * When SM already has these contact details, then empty submission will overwrite contact info.
+ *
+ * @param EntityInterface $form_fields SM form configuration
+ * @param $form_values array Form values
+ * @param $options array Data to send to SM
+ */
+function set_optional_values(EntityInterface $form_fields, $form_values, &$options) {
+  if (isset($form_values['forceOptIn']) and $form_values['forceOptIn'] == 1) {
+    $options['forceOptOut'] = false;
+    $options['forceOptIn'] = true;
+  }
+
+  if (isset($form_values['forcePhoneOptIn']) and $form_values['forcePhoneOptIn'] == 1) {
+    $options['forcePhoneOptOut'] = false;
+    $options['forcePhoneOptIn'] = true;
+  }
+
   if (isset($form_values['phone']) and $form_values['phone'] != '') {
-    $options['contact']['phone'] = $form_values['phone'];
+    $options['contact']['phone'] = strip_tags($form_values['phone']);
   }
 
   if (isset($form_fields->tags) and $form_fields->tags != '') {
@@ -151,13 +165,13 @@ function salesmanago_integration_webform_submit_handler($form, FormStateInterfac
   }
 
   if (isset($form_values['message']) and $form_values['message'] != '') {
-    $messageLabel = 'mail ' . date('Y-m-d H:i:s');
-    $options['properties'][$messageLabel] = $form_values['message'];
+    $messageLabel = 'Message_' . date('Y-m-d_H:i:s');
+    $options['properties'][$messageLabel] = strip_tags($form_values['message']);
   }
 
   if (isset($form_values['pickList']) and $form_values['pickList'] != '') {
-    $detailLabel = date('Y-m-d H:i:s');
-    $options['properties'][$detailLabel] = $form_values['pickList'];
+    $detailValue = date('Y-m-d H:i:s');
+    $options['properties'][$form_values['pickList']] = $detailValue;
   }
 
   if (isset($form_fields->consentCount) and $form_fields->consentCount > 0) {
@@ -170,18 +184,25 @@ function salesmanago_integration_webform_submit_handler($form, FormStateInterfac
       ];
     }
   }
+}
 
-  // Try sending a POST request to SALESmanago API.
+/**
+ * Send the colleted data to SALESmanago API
+ *
+ * @param $url string API url
+ * @param $options array API POST data
+ */
+function send_request($url, $options) {
+  $options['requestTime'] = \Drupal::time()->getRequestTime();
+
   // SALESmanago API only accepted requests that have been put on an array named 'json'.
   try {
     $logger = \Drupal::logger('salesmanago_integration');
-
     $response = \Drupal::httpClient()->post($url, ['json' => $options]);
-
 
     // DBLog messages
     if ($response->getStatusCode() == 200) {
-        $logger->notice('Request to SALESmanago API executed successfully.');
+      $logger->notice('Request to SALESmanago API executed successfully.');
     } else {
       $logger->warning('SALESmanago API request error: <br />' . $response->getBody());
     }
