@@ -106,11 +106,11 @@ function salesmanago_integration_webform_submit_handler($form, FormStateInterfac
  * Get form values from form fields specified in SALESmanago forms settings
  * Loop over SM forms settings and get all configured form field values
  *
- * @param EntityInterface $form_fields Form field ids from configuration
+ * @param EntityInterface $form_fields SalesManago Form field ids from configuration
  * @param FormStateInterface $form_state
  * @return array
  */
-function get_form_values(EntityInterface $form_fields, FormStateInterface $form_state) {
+function get_form_values($form_fields, FormStateInterface $form_state) {
   $form_values = [];
 
   foreach ($form_fields as $sm_field => $webform_field) {
@@ -141,11 +141,11 @@ function get_form_values(EntityInterface $form_fields, FormStateInterface $form_
  * If submitted form field value is empty, do not include it in the API request.
  * When SM already has these contact details, then empty submission will overwrite contact info.
  *
- * @param EntityInterface $form_fields SM form configuration
+ * @param EntityInterface $form_fields SalesManago form configuration
  * @param $form_values array Form values
  * @param $options array Data to send to SM
  */
-function set_optional_values(EntityInterface $form_fields, $form_values, &$options) {
+function set_optional_values($form_fields, $form_values, &$options) {
   if (isset($form_values['forceOptIn']) and $form_values['forceOptIn'] == 1) {
     $options['forceOptOut'] = false;
     $options['forceOptIn'] = true;
@@ -180,7 +180,7 @@ function set_optional_values(EntityInterface $form_fields, $form_values, &$optio
         'consentName' => $form_fields->consentDetails[$index]['name'],
         'consentAccept' => $form_values['consentDetails'][$index],
         'ip' => \Drupal::request()->getClientIp(),
-        'optOut' => true,
+        'optOut' => !$form_values['consentDetails'][$index],
       ];
     }
   }
