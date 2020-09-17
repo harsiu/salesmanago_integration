@@ -13,7 +13,7 @@ entity.endpoint.edit_form:
     _title: 'Edit endpoint config'
     _entity_form: endpoint.edit
   requirements:
-    _entity_access: endpoint.update
+    _permission: 'administer salesmanago'
 
 
 entity.salesmanago.list:
@@ -30,7 +30,7 @@ entity.salesmanago.add_form:
     _title: 'Add webform config'
     _entity_form: salesmanago.add
   requirements:
-    _entity_create_access: salesmanago
+    _permission: 'administer salesmanago'
 
 entity.salesmanago.edit_form:
   path: '/admin/config/salesmanago-integration/form/{salesmanago}/edit'
@@ -38,7 +38,7 @@ entity.salesmanago.edit_form:
     _title: 'Edit webform config'
     _entity_form: salesmanago.edit
   requirements:
-    _entity_access: salesmanago.update
+    _permission: 'administer salesmanago'
 
 entity.salesmanago.delete_form:
   path: '/admin/config/salesmanago-integration/form/{salesmanago}/delete'
@@ -46,4 +46,4 @@ entity.salesmanago.delete_form:
     _title: 'Delete webform config'
     _entity_form: salesmanago.delete
   requirements:
-    _entity_access: salesmanago.delete
+    _permission: 'administer salesmanago'

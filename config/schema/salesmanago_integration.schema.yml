@@ -13,10 +13,10 @@ salesmanago_integration.endpoint.*:
     address:
       type: string
       label: 'Endpoint Address'
-    client_id:
+    clientId:
       type: string
       label: 'Client ID'
-    api_secret:
+    apiSecret:
       type: string
       label: 'API Secret'
     langcode:
@@ -25,7 +25,7 @@ salesmanago_integration.endpoint.*:
 
 salesmanago_integration.salesmanago.*:
   type: config_entity
-  label: 'SALESmanago Endpoint'
+  label: 'SALESmanago request config'
   mapping:
     id:
       type: string
@@ -35,28 +35,22 @@ salesmanago_integration.salesmanago.*:
       label: 'UUID'
     name:
       type: string
-      label: 'Webform name field ID'
+      label: 'Name field ID'
     email:
       type: string
-      label: 'Webform email field ID'
+      label: 'Email field ID'
     phone:
       type: string
-      label: 'Webform phone field ID'
+      label: 'Phone field ID'
     tags:
       type: array
       label: 'Contact tags'
-    message:
-      type: string
-      label: 'Webform phone field ID'
     forceOptIn:
       type: string
       label: 'Email consent checkbox ID'
     forcePhoneOptIn:
       type: string
       label: 'Phone consent checkbox ID'
-    consentCount:
-      type: integer
-      label: 'Count of custom consents the system will use'
     consentDetails:
       type: mapping
       label: 'Custom consent settings'
@@ -67,6 +61,23 @@ salesmanago_integration.salesmanago.*:
         field:
           type: string
           label: 'Consent form field ID'
-    pickList:
-      type: string
-      label: 'Picklist field ID'
+    standardDetails:
+      type: mapping
+      label: 'Standard details settings'
+      mapping:
+        label:
+          type: string
+          label: 'Standard detail label'
+        field:
+          type: string
+          label: 'Standard detail field ID'
+    notes:
+      type: mapping
+      label: 'Notes settings'
+      mapping:
+        label:
+          type: string
+          label: 'Header to add to note text'
+        field:
+          type: string
+          label: 'Form field for note content'

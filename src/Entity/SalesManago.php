@@ -36,12 +36,11 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *     "email",
  *     "phone",
  *     "tags",
- *     "message",
  *     "forceOptIn",
  *     "forcePhoneOptIn",
- *     "consentCount",
  *     "consentDetails",
- *     "pickList",
+ *     "standardDetails",
+ *     "notes",
  *   }
  * )
  */
@@ -90,13 +89,6 @@ class SalesManago extends ConfigEntityBase {
   public $tags;
 
   /**
-   * Message field ID
-   *
-   * @var string
-   */
-  public $message;
-
-  /**
    * Email consent.
    *
    * @var string
@@ -113,21 +105,21 @@ class SalesManago extends ConfigEntityBase {
   /**
    * Custom consents.
    *
-   * @var integer
-   */
-  public $consentCount;
-
-  /**
-   * Custom consents.
-   *
    * @var array
    */
   public $consentDetails;
 
   /**
-   * Picklist field ID
+   * Standard details.
    *
-   * @var string
+   * @var array
    */
-  public $pickList;
+  public $standardDetails;
+
+  /**
+   * Notes.
+   *
+   * @var array
+   */
+  public $notes;
 }

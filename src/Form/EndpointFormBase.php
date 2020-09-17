@@ -3,6 +3,8 @@
 namespace Drupal\salesmanago_integration\Form;
 
 use Drupal\Core\Entity\EntityForm;
+use Drupal\Core\Entity\EntityMalformedException;
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
@@ -18,14 +20,14 @@ class EndpointFormBase extends EntityForm {
   /**
    * An entity query factory for the endpoint entity type.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * @var EntityStorageInterface
    */
   protected $entityStorage;
 
   /**
    * Construct the EndpointFormBase.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $entity_storage
+   * @param EntityStorageInterface $entity_storage
    *   An entity query factory for the endpoint entity type.
    */
   public function __construct(EntityStorageInterface $entity_storage) {
@@ -35,6 +37,8 @@ class EndpointFormBase extends EntityForm {
   /**
    * Factory method for EndpointFormBase.
    *
+   * @param ContainerInterface $container
+   * @return EndpointFormBase|static
    */
   public static function create(ContainerInterface $container) {
     $form = new static($container->get('entity_type.manager')->getStorage('endpoint'));
@@ -49,7 +53,7 @@ class EndpointFormBase extends EntityForm {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   An associative array containing the current state of the form.
    *
    * @return array
@@ -80,18 +84,18 @@ class EndpointFormBase extends EntityForm {
       '#default_value' => $endpoint->address,
       '#required' => TRUE,
     ];
-    $form['client_id'] = [
+    $form['clientId'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Client ID'),
       '#maxlength' => 255,
-      '#default_value' => $endpoint->client_id,
+      '#default_value' => $endpoint->clientId,
       '#required' => TRUE,
     ];
-    $form['api_secret'] = [
+    $form['apiSecret'] = [
       '#type' => 'textfield',
       '#title' => $this->t('API Secret'),
       '#maxlength' => 255,
-      '#default_value' => $endpoint->api_secret,
+      '#default_value' => $endpoint->apiSecret,
       '#required' => TRUE,
     ];
     $form['email'] = [
@@ -113,7 +117,7 @@ class EndpointFormBase extends EntityForm {
    *   The entity ID.
    * @param array $element
    *   The form element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state.
    *
    * @return bool
@@ -136,7 +140,7 @@ class EndpointFormBase extends EntityForm {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   An associative array containing the current state of the form.
    *
    * @return array
@@ -170,8 +174,8 @@ class EndpointFormBase extends EntityForm {
    * @param FormStateInterface $form_state
    *   An associative array containing the current state of the form.
    * @return int|void
-   * @throws \Drupal\Core\Entity\EntityMalformedException
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityMalformedException
+   * @throws EntityStorageException
    */
   public function save(array $form, FormStateInterface $form_state) {
     // EntityForm provides us with the entity we're working on.

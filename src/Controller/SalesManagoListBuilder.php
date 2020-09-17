@@ -37,7 +37,7 @@ class SalesManagoListBuilder extends ConfigEntityListBuilder {
   /**
    * Builds a row for an entity in the entity listing.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity for which to build the row.
    *
    * @return array

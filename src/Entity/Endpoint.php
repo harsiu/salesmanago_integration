@@ -30,8 +30,8 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *     "id",
  *     "uuid",
  *     "address",
- *     "client_id",
- *     "api_secret",
+ *     "clientId",
+ *     "apiSecret",
  *     "email",
  *   }
  * )
@@ -64,14 +64,14 @@ class Endpoint extends ConfigEntityBase {
    *
    * @var string
    */
-  public $client_id;
+  public $clientId;
 
   /**
    * The API secret key.
    *
    * @var string
    */
-  public $api_secret;
+  public $apiSecret;
 
   /**
    * The SALESmanago account email address.

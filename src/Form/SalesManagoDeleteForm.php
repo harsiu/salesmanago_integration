@@ -3,6 +3,7 @@
 namespace Drupal\salesmanago_integration\Form;
 
 use Drupal\Core\Entity\EntityConfirmFormBase;
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Url;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -38,7 +39,7 @@ class SalesManagoDeleteForm extends EntityConfirmFormBase {
   /**
    * Gets the cancel URL.
    *
-   * @return \Drupal\Core\Url
+   * @return Url
    *   The URL to go to if the user cancels the deletion.
    */
   public function getCancelUrl() {
@@ -52,7 +53,7 @@ class SalesManagoDeleteForm extends EntityConfirmFormBase {
    *   An associative array containing the structure of the form.
    * @param FormStateInterface $form_state
    *   An associative array containing the current state of the form.
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     // Delete the entity.
