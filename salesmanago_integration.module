@@ -167,7 +167,6 @@ function set_contact_request($form_fields, $form_values, $form_state, $api_addre
     $contact_request['tags'] = $tags;
   }
 
-  /**
   if (!empty($form_fields->consentDetails)) {
     foreach ($form_fields->consentDetails as $key => $consent) {
       $contact_request['consentDetails'][] = [
@@ -178,7 +177,6 @@ function set_contact_request($form_fields, $form_values, $form_state, $api_addre
       ];
     }
   }
-   **/
 
   if (!empty($form_fields->standardDetails)) {
     foreach ($form_fields->standardDetails as $key => $detail) {
@@ -214,12 +212,14 @@ function set_contact_request($form_fields, $form_values, $form_state, $api_addre
  */
 function set_note_request($form_fields, $form_values, $form_state, $api_address, &$note_request) {
   if (!empty($form_fields->notes)) {
+    $url = 'https://' . $api_address . '/api/contact/addNote'; // set full path for specific api request
+
     foreach ($form_fields->notes as $key => $note) {
       // Note label and value could either be a string with token or a form field value
       $header = $form_state->getValue($note['label']);
       $content = $form_values['standardDetails'][$key];
 
-      if (empty($label)) {
+      if (empty($header)) {
         $header = \Drupal::token()->replace($note['label']);
       }
 
@@ -231,10 +231,9 @@ function set_note_request($form_fields, $form_values, $form_state, $api_address,
       $note_request['note'] = addslashes(strip_tags($note));
 
       if (empty($note_request['note'])) {
-        return ;
+        continue;
       }
 
-      $url = 'https://' . $api_address . '/api/contact/addNote'; // set full path for specific api request
       send_request($url, $note_request, 'Notes');
     }
   }
