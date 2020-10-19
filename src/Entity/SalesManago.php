@@ -32,6 +32,8 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *   config_export = {
  *     "id",
  *     "uuid",
+ *     "emailConsent",
+ *     "phoneConsent",
  *     "name",
  *     "email",
  *     "phone",
@@ -59,6 +61,20 @@ class SalesManago extends ConfigEntityBase {
    * @var string
    */
   public $uuid;
+
+  /**
+   * Default email opt-in
+   *
+   * @var boolean
+   */
+  public $emailConsent;
+
+  /**
+   * Default phone opt-in
+   *
+   * @var boolean
+   */
+  public $phoneConsent;
 
   /**
    * Webform name field ID.

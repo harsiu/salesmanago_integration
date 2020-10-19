@@ -112,6 +112,18 @@ class SalesManagoFormBase extends EntityForm {
       '#disabled' => !$salesmanago->isNew(),
     ];
 
+    $form['emailConsent'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Default email opt-in'),
+      '#default_value' => $salesmanago->emailConsent,
+    );
+
+    $form['phoneConsent'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Default phone opt-in'),
+      '#default_value' => $salesmanago->phoneConsent,
+    );
+
     $form['contact_info'] = [
       '#type' => 'details',
       '#open' => true,

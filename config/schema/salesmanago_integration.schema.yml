@@ -33,6 +33,12 @@ salesmanago_integration.salesmanago.*:
     uuid:
       type: string
       label: 'UUID'
+    emailConsent:
+      type: boolean
+      label: 'Default email opt-in'
+    phoneConsent:
+      type: boolean
+      label: 'Default phone opt-in'
     name:
       type: string
       label: 'Name field ID'

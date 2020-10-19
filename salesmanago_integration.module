@@ -35,6 +35,12 @@ function salesmanago_integration_form_alter(array &$form, FormStateInterface $fo
 function salesmanago_integration_webform_submit_handler($form, FormStateInterface $form_state) {
   // endpoint config
   $endpoint = \Drupal::entityTypeManager()->getStorage('endpoint')->load('default');
+
+  if (empty($endpoint->address)) {
+    \Drupal::logger('salesmanago_integration')->error("Missing emdpoint address. Please check your endpoint settings");
+    return false;
+  }
+
   // salesmanago config for current form
   $form_fields = \Drupal::entityTypeManager()->getStorage('salesmanago')->load($form['form_id']['#value']);
 
@@ -45,6 +51,16 @@ function salesmanago_integration_webform_submit_handler($form, FormStateInterfac
    *   - value is value of submitted form field
    */
   $form_values = get_form_values($form_fields, $form_state);
+
+  $email_consent = false;
+  $phone_consent = false;
+
+  if (isset($form_fields->emailConsent) && is_bool($form_fields->emailConsent)) {
+    $email_consent = $form_fields->emailConsent;
+  }
+  if (isset($form_fields->phoneConsent) && is_bool($form_fields->phoneConsent)) {
+    $phone_consent = $form_fields->phoneConsent;
+  }
 
   /**
    * Accept and Content-Type headers are required according to Salesmanago API
@@ -79,10 +95,10 @@ function salesmanago_integration_webform_submit_handler($form, FormStateInterfac
       'email' => $form_values['email'],
     ],
     'owner' => $endpoint->email,
-    'forceOptIn' => false,
-    'forceOptOut' => true,
-    'forcePhoneOptIn' => false,
-    'forcePhoneOptOut' => true,
+    'forceOptIn' => $email_consent,
+    'forceOptOut' => !$email_consent,
+    'forcePhoneOptIn' => $phone_consent,
+    'forcePhoneOptOut' => !$phone_consent,
   ];
 
   set_contact_request($form_fields, $form_values, $form_state, $endpoint->address, $contact_request);
@@ -113,22 +129,24 @@ function get_form_values($form_fields, FormStateInterface $form_state) {
 
   foreach ($form_fields as $sm_setting => $sm_setting_value) {
     switch ($sm_setting) {
-      case ($sm_setting == 'uuid' || $sm_setting == 'id' || $sm_setting == 'consentCount'):
+      case ($sm_setting == 'uuid' || $sm_setting == 'id' || $sm_setting == 'emailConsent' ||
+        $sm_setting == 'phoneConsent'):
       {
         break;
       }
       case ($sm_setting == 'consentDetails' || $sm_setting == 'standardDetails' ||
         $sm_setting == 'notes'):
       {
-        foreach ($sm_setting_value as $key => $setting) {
-          $form_values[$sm_setting][$key] = $form_state->getValue($setting['field']);
+        if (!empty($sm_setting_value)) {
+          foreach ($sm_setting_value as $key => $setting) {
+            $form_values[$sm_setting][$key] = $form_state->getValue($setting['field']);
+          }
         }
 
         break;
       }
       default:
       {
-        // if SM API field is configured
         if (!empty($sm_setting_value)) {
           $form_values[$sm_setting] = $form_state->getValue($sm_setting_value);
         }
@@ -152,12 +170,14 @@ function get_form_values($form_fields, FormStateInterface $form_state) {
  * @return
  */
 function set_contact_request($form_fields, $form_values, $form_state, $api_address, &$contact_request) {
-  if (isset($form_values['forceOptIn']) && $form_values['forceOptIn'] == 1) {
+  if ((isset($form_values['forceOptIn']) && $form_values['forceOptIn'] == 1) &&
+    (isset($form_fields->emailConsent) && is_bool($form_fields->emailConsent))) {
     $contact_request['forceOptOut'] = false;
     $contact_request['forceOptIn'] = true;
   }
 
-  if (isset($form_values['forcePhoneOptIn']) && $form_values['forcePhoneOptIn'] == 1) {
+  if ((isset($form_values['forcePhoneOptIn']) && $form_values['forcePhoneOptIn'] == 1) &&
+    (isset($form_fields->phoneConsent) && is_bool($form_fields->phoneConsent))) {
     $contact_request['forcePhoneOptOut'] = false;
     $contact_request['forcePhoneOptIn'] = true;
   }
@@ -219,6 +239,10 @@ function set_note_request($form_fields, $form_values, $form_state, $api_address,
     $url = 'https://' . $api_address . '/api/contact/addNote'; // set full path for specific api request
 
     foreach ($form_fields->notes as $key => $note) {
+      if (empty($note['label']) && empty($note['field'])) {
+        continue;
+      }
+
       // Note label and value could either be a string with token or a form field value
       $header = $form_state->getValue($note['label']);
       $content = $form_values['standardDetails'][$key];
